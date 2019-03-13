@@ -1,35 +1,18 @@
 import numpy as np
-from keras.models import load_model
-from keras.preprocessing.sequence import pad_sequences
-import tensorflow as tf
+# from keras.models import load_model
+# from keras.preprocessing.sequence import pad_sequences
+# import tensorflow as tf
 from collections import Counter
 import tweepy
-import boto3.session
 import _pickle
 import h5py
 import gc
 
 
-session = boto3.session.Session(region_name='ap-south-1')
-s3client = session.client('s3', config=boto3.session.Config(signature_version='s3v4', region_name='ap-south-1'),
-                          aws_access_key_id='**',
-                          aws_secret_access_key='**+T')
-
 
 def most_common(lst):
     return max(set(lst), key=lst.count)
 
-
-def load_from_s3(str):
-    response = s3client.get_object(Bucket='mlsite-bucket', Key=str)
-    body = response['Body']
-    if '.h5' in str:
-        f = open(body, 'rb')
-        h = h5py.File(f, 'r')
-        detector = load_model(h)
-    else:
-        detector = _pickle.loads(body.read())
-    return detector
 
 
 def load_offline(str):
@@ -42,16 +25,16 @@ word2index = load_offline('app/static/models/word2index.pkl')
 vectorizer = load_offline('app/static/models/vectorizer.pkl')
 
 
-def init_model():
-    lstm_model = load_model('app/static/models/lstm.h5')
-    cnn_model = load_model('app/static/models/cnn.h5')
-    cnn_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    lstm_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    graph = tf.get_default_graph()
-    return lstm_model, cnn_model, graph
+# def init_model():
+#     lstm_model = load_model('app/static/models/lstm.h5')
+#     cnn_model = load_model('app/static/models/cnn.h5')
+#     cnn_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+#     lstm_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+#     graph = tf.get_default_graph()
+#     return lstm_model, cnn_model, graph
 
 
-lmodel, cnn, graph = init_model()
+# lmodel, cnn, graph = init_model()
 logistic = load_offline('app/static/models/logisticreg.pkl')
 adaboost = load_offline('app/static/models/adaboost.pkl')
 bernoulli = load_offline('app/static/models/bernoullinb.pkl')
@@ -104,29 +87,30 @@ def predictor(query):
     ber = bernoulli.predict(clean_query)
     lg = logistic.predict(clean_query)
     dt = decisiontree.predict(clean_query)
-    gb = gradientboost.predict(clean_query.toarray())
+    # gb = gradientboost.predict(clean_query.toarray())
     knnp = knn.predict(clean_query)
     rf = randomforest.predict(clean_query)
     mnb = multinomialnb.predict(clean_query)
     svm = svm10.predict(clean_query)
 
-    with graph.as_default():
-        lout = lmodel.predict(lencode(query))
-        cnn_out = cnn.predict(lencode(query))
-        lout = np.argmax(lout, axis=1)
-        cnn_out = np.argmax(cnn_out, axis=1)
+    # with graph.as_default():
+    #     lout = lmodel.predict(lencode(query))
+    #     cnn_out = cnn.predict(lencode(query))
+    #     lout = np.argmax(lout, axis=1)
+    #     cnn_out = np.argmax(cnn_out, axis=1)
 
     return [ada.tolist()[0],
             ber.tolist()[0],
             dt.tolist()[0],
-            gb.tolist()[0],
+            #gb.tolist()[0],
             knnp.tolist()[0],
             rf.tolist()[0],
             mnb.tolist()[0],
             lg.tolist()[0],
-            svm.tolist()[0],
-            lout.tolist()[0],
-            cnn_out.tolist()[0]]
+            svm.tolist()[0]
+            #lout.tolist()[0],
+            #cnn_out.tolist()[0]]
+            ]
 
 
 def get_most_count(x):
@@ -144,14 +128,15 @@ def processing_results(query):
     data = {'AdaBoost': 0,
             'BernoulliNB': 0,
             'DecisionTree': 0,
-            'GradientBoost': 0,
+            #'GradientBoost': 0,
             'KNNeighbors': 0,
             'RandomForest': 0,
             'MultinomialNB': 0,
             'Logistic Regression': 0,
-            'SVM': 0,
-            'LSTM network': 0,
-            'Convolutional Neural Network': 0}
+            'SVM': 0}
+            # ,
+            # 'LSTM network': 0,
+            # 'Convolutional Neural Network': 0}
 
     # overal per sentence
     predict_list = np.array(predict_list)

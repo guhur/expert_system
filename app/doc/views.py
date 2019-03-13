@@ -3,7 +3,6 @@ from ..load import processing_results
 from werkzeug.utils import secure_filename
 import os
 import gc
-import resource
 
 doc_mod = Blueprint('doc', __name__, template_folder='templates', static_folder='static')
 
