@@ -20,8 +20,8 @@ def twitter():
     if request.method == 'POST':
 
         text = []
-        for tweet in tweepy.Cursor(api.search, request.form['topic'], lang='hi').items(100):
-            temp = ''.join(takeout_non_ascii(tweet.text))
+        for tweet in tweepy.Cursor(api.search, request.form['topic'], lang='en').items(100):
+            temp = ''.join(tweet.text)
             if not len(temp) in range(3):
                 text.append(temp)
 

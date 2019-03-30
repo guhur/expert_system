@@ -1,3 +1,4 @@
+import os
 import numpy as np
 # from keras.models import load_model
 # from keras.preprocessing.sequence import pad_sequences
@@ -8,6 +9,8 @@ import _pickle
 import h5py
 import gc
 import warnings
+import joblib
+
 warnings.filterwarnings("ignore", category=UserWarning)
 
 
@@ -17,9 +20,13 @@ def most_common(lst):
 
 
 def load_offline(str):
-    with open(str, 'rb') as f:
-        dump = _pickle.load(f)
-    return dump
+    ext = os.path.splitext(str)[1]
+    if ext == ".joblib":
+        return joblib.load(str)
+    else:
+        with open(str, 'rb') as f:
+            dump = _pickle.load(f)
+        return dump
 
 
 word2index = load_offline('app/static/models/word2index.pkl')
@@ -43,7 +50,8 @@ decisiontree = load_offline('app/static/models/decisiontree.pkl')
 gradientboost = load_offline('app/static/models/gradientboost.pkl')
 knn = load_offline('app/static/models/knn.pkl')
 randomforest = load_offline('app/static/models/randomforest.pkl')
-multinomialnb = load_offline('app/static/models/multinomialnb.pkl')
+multinomialnb = load_offline('model/multinomial-nb.joblib')
+#multinomialnb = load_offline('app/static/models/multinomialnb.pkl')
 svm10 = load_offline('app/static/models/svm10.pkl')
 
 auth = tweepy.OAuthHandler('hXJ8TwQzVya3yYwQN1GNvGNNp', 'diX9CFVOOfWNli2KTAYY13vZVJgw1sYlEeOTxsLsEb2x73oI8S')
@@ -83,35 +91,38 @@ def word_feats(text):
 
 
 def predictor(query):
+    print(query)
     clean_query = clean(query)
-    ada = adaboost.predict(clean_query)
-    ber = bernoulli.predict(clean_query)
-    lg = logistic.predict(clean_query)
-    dt = decisiontree.predict(clean_query)
-    # gb = gradientboost.predict(clean_query.toarray())
-    knnp = knn.predict(clean_query)
-    rf = randomforest.predict(clean_query)
-    mnb = multinomialnb.predict(clean_query)
-    svm = svm10.predict(clean_query)
+    print(clean_query)
+#    ada = adaboost.predict(clean_query)
+#    ber = bernoulli.predict(clean_query)
+#    lg = logistic.predict(clean_query)
+#    dt = decisiontree.predict(clean_query)
+#    # gb = gradientboost.predict(clean_query.toarray())
+#    knnp = knn.predict(clean_query)
+#    rf = randomforest.predict(clean_query)
+    mnb = multinomialnb.predict([query])
+#    svm = svm10.predict(clean_query)
 
     # with graph.as_default():
     #     lout = lmodel.predict(lencode(query))
     #     cnn_out = cnn.predict(lencode(query))
     #     lout = np.argmax(lout, axis=1)
     #     cnn_out = np.argmax(cnn_out, axis=1)
-
-    return [ada.tolist()[0],
-            ber.tolist()[0],
-            dt.tolist()[0],
-            #gb.tolist()[0],
-            knnp.tolist()[0],
-            rf.tolist()[0],
-            mnb.tolist()[0],
-            lg.tolist()[0],
-            svm.tolist()[0]
-            #lout.tolist()[0],
-            #cnn_out.tolist()[0]]
-            ]
+    return [mnb.tolist()[0]]
+    #return [mnb.tolist()[0]]
+#    return [ada.tolist()[0],
+#            ber.tolist()[0],
+#            dt.tolist()[0],
+#            #gb.tolist()[0],
+#            knnp.tolist()[0],
+#            rf.tolist()[0],
+#            mnb.tolist()[0],
+#            lg.tolist()[0],
+#            svm.tolist()[0]
+#            #lout.tolist()[0],
+#            #cnn_out.tolist()[0]]
+#            ]
 
 
 def get_most_count(x):
@@ -138,7 +149,7 @@ def processing_results(query):
             # ,
             # 'LSTM network': 0,
             # 'Convolutional Neural Network': 0}
-
+    data = {'MultinomialNB': 0}
     # overal per sentence
     predict_list = np.array(predict_list)
     i = 0

@@ -6,3 +6,8 @@ h5py
 scikit-learn
 tweepy
 pandas
+jupyter
+matplotlib
+ntlk
+bokeh
+joblib
