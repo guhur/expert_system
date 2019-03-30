@@ -7,7 +7,8 @@ import tweepy
 import _pickle
 import h5py
 import gc
-
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 def most_common(lst):
