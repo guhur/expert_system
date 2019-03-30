@@ -2,9 +2,9 @@
 {% block content %}
     <div class="container">
         <div class="col-md-10">
-            <h4 class="legend">Please Enter your example text for sentiment analysis</h4>
+            <h4 class="legend">Please Enter your example text for sentiment analysis. Don't forget to end your tweet by a "." </h4>
             <form id="input-form" action="{{ url_for('liner.liner') }}", method="post">
-                <textarea rows="10" cols="100" style="margin-bottom: 20px" name="liner-text"> I love this company #bestcompanyever 
+                <textarea rows="10" cols="100" style="margin-bottom: 20px" name="liner-text"> I love this company #bestcompanyever. 
 </textarea>
                 <br>
                 <input type="submit" value="Predict" class="btn btn-primary">
@@ -14,16 +14,7 @@
             <div class="alert alert-danger warning">{{ message }}</div>
         {% endif %}
         </div>
-        <div class="col-md-2" style="padding-top: 4%;">
-            <ul class="list-group">
-                <li class="list-group-item">
-                    <a href="{{ url_for('doc.doc') }}">Document Analysis</a>
-                </li>
-                <li class="list-group-item">
-                    <a href="{{ url_for('twitter.twitter') }}">Tweet Analysis</a>
-                </li>
-            </ul>
-        </div>
+
 
     </div>
 
