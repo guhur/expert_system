@@ -1,8 +1,6 @@
 import os
 import numpy as np
-# from keras.models import load_model
-# from keras.preprocessing.sequence import pad_sequences
-# import tensorflow as tf
+import configparser
 from collections import Counter
 import tweepy
 import _pickle
@@ -31,48 +29,23 @@ def load_offline(str):
 
 word2index = load_offline('app/static/models/word2index.pkl')
 vectorizer = load_offline('app/static/models/vectorizer.pkl')
-
-
-# def init_model():
-#     lstm_model = load_model('app/static/models/lstm.h5')
-#     cnn_model = load_model('app/static/models/cnn.h5')
-#     cnn_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-#     lstm_model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-#     graph = tf.get_default_graph()
-#     return lstm_model, cnn_model, graph
-
-
-# lmodel, cnn, graph = init_model()
-logistic = load_offline('app/static/models/logisticreg.pkl')
-adaboost = load_offline('app/static/models/adaboost.pkl')
-bernoulli = load_offline('app/static/models/bernoullinb.pkl')
-decisiontree = load_offline('app/static/models/decisiontree.pkl')
-gradientboost = load_offline('app/static/models/gradientboost.pkl')
-knn = load_offline('app/static/models/knn.pkl')
-randomforest = load_offline('app/static/models/randomforest.pkl')
 multinomialnb = load_offline('model/multinomial-nb.joblib')
-#multinomialnb = load_offline('app/static/models/multinomialnb.pkl')
-svm10 = load_offline('app/static/models/svm10.pkl')
 
-auth = tweepy.OAuthHandler('hXJ8TwQzVya3yYwQN1GNvGNNp', 'diX9CFVOOfWNli2KTAYY13vZVJgw1sYlEeOTxsLsEb2x73oI8S')
-auth.set_access_token('2155329456-53H1M9QKqlQbEkLExgVgkeallweZ9N74Aigm9Kh',
-                      'waDPwamuPkYHFLdVNZ5YF2SNWuYfGHDVFue6bEbEGjTZb')
+config = configparser.ConfigParser()
+config.read("keys.cfg")
+consumer_secret = config.get("Twitter", "consumer_secret")
+consumer_token = config.get("Twitter", "consumer_token")
+token_key = config.get("Twitter", "token_key")
+token_secret = config.get("Twitter", "token_secret")
 
+auth = tweepy.OAuthHandler(consumer_token, consumer_secret)
+auth.set_access_token(token_key, token_secret)
 api = tweepy.API(auth)
 
 
 def clean(query):
     return vectorizer.transform([query])
 
-
-# def pencode(text):
-#     vector = np.zeros(12429)
-#     for i, word in enumerate(text.split(' ')):
-#         try:
-#             vector[word2index[word]] = 1
-#         except KeyError:
-#             vector[i] = 0
-#     return vector
 
 
 def lencode(text):
@@ -91,38 +64,9 @@ def word_feats(text):
 
 
 def predictor(query):
-    print(query)
     clean_query = clean(query)
-    print(clean_query)
-#    ada = adaboost.predict(clean_query)
-#    ber = bernoulli.predict(clean_query)
-#    lg = logistic.predict(clean_query)
-#    dt = decisiontree.predict(clean_query)
-#    # gb = gradientboost.predict(clean_query.toarray())
-#    knnp = knn.predict(clean_query)
-#    rf = randomforest.predict(clean_query)
     mnb = multinomialnb.predict([query])
-#    svm = svm10.predict(clean_query)
-
-    # with graph.as_default():
-    #     lout = lmodel.predict(lencode(query))
-    #     cnn_out = cnn.predict(lencode(query))
-    #     lout = np.argmax(lout, axis=1)
-    #     cnn_out = np.argmax(cnn_out, axis=1)
     return [mnb.tolist()[0]]
-    #return [mnb.tolist()[0]]
-#    return [ada.tolist()[0],
-#            ber.tolist()[0],
-#            dt.tolist()[0],
-#            #gb.tolist()[0],
-#            knnp.tolist()[0],
-#            rf.tolist()[0],
-#            mnb.tolist()[0],
-#            lg.tolist()[0],
-#            svm.tolist()[0]
-#            #lout.tolist()[0],
-#            #cnn_out.tolist()[0]]
-#            ]
 
 
 def get_most_count(x):
@@ -137,26 +81,12 @@ def processing_results(query):
         line_sentiment.append(most_common(p))
         predict_list.append(p)
 
-    data = {'AdaBoost': 0,
-            'BernoulliNB': 0,
-            'DecisionTree': 0,
-            #'GradientBoost': 0,
-            'KNNeighbors': 0,
-            'RandomForest': 0,
-            'MultinomialNB': 0,
-            'Logistic Regression': 0,
-            'SVM': 0}
-            # ,
-            # 'LSTM network': 0,
-            # 'Convolutional Neural Network': 0}
     data = {'MultinomialNB': 0}
+
     # overal per sentence
     predict_list = np.array(predict_list)
-    i = 0
-    for key in data:
-
+    for i, key in enumerate(data):
         data[key] = get_most_count(predict_list[:, i])
-        i += 1
 
     # all the sentences with 3 emotions
     predict_list = predict_list.tolist()
