@@ -27,8 +27,8 @@ def load_offline(str):
         return dump
 
 
-word2index = load_offline('app/static/models/word2index.pkl')
-vectorizer = load_offline('app/static/models/vectorizer.pkl')
+vectorizer = load_offline('model/vectorizer.pkl')
+word2index = load_offline('model/word2index.pkl')
 multinomialnb = load_offline('model/multinomial-nb.joblib')
 randomforest = load_offline('model/random-forest.joblib')
 grad_boost = load_offline('model/gradient-boosting.joblib')
