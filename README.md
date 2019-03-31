@@ -53,3 +53,12 @@ A server can be launched with:
 ```
 
 Then, use your browser to go to [http://127.0.0.1:8000](http://127.0.0.1:8000).
+
+
+# Jupyter notebooks
+
+The repository contains several notebooks for training classifiers and viewing data: 
+
+- `Classifier.ipynb` trains classifiers;
+- `Create_dataset.ipynb` is downloading tweets to create new datasets;
+- `Viewing-data.ipynb` provides a few basic visualization tools.
