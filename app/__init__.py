@@ -1,7 +1,6 @@
 from flask import Flask, url_for
 from .home.views import home_mod
 from .liner.views import liner_mod
-from .doc.views import doc_mod
 from .twitter.views import twitter_mod
 import os
 
@@ -12,7 +11,6 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 app.register_blueprint(home_mod)
 app.register_blueprint(liner_mod)
-app.register_blueprint(doc_mod)
 app.register_blueprint(twitter_mod)
 
 @app.context_processor
