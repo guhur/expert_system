@@ -8,6 +8,6 @@ tweepy
 pandas
 jupyter
 matplotlib
-ntlk
+nltk
 bokeh
 joblib

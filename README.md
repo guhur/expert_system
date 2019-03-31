@@ -1,7 +1,7 @@
 # EXPERT SYSTEM
 
 This is an application for course IDSI31421.
-It analysis overall sentiments of tweets between "Negative", "Neutral" and "Positive".
+It analyzes overall sentiments of tweets between "Negative", "Neutral" and "Positive".
 
 # Dataset
 
